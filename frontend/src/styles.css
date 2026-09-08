@@ -1,0 +1,517 @@
+/* QuantumRoute - app shell styling.
+   Light and dark are both defined at token level so the app follows the OS. */
+
+:root {
+  --ground: #eef1f3;
+  --surface: #ffffff;
+  --surface-2: #f5f7f9;
+  --ink: #131c24;
+  --muted: #5c6b78;
+  --faint: #8a98a3;
+  --rule: #d8dee3;
+  --accent: #0e6c7d;
+  --accent-ink: #ffffff;
+  --accent-soft: #d9ebee;
+  --good: #2c6b3e;
+  --bad: #9b3226;
+  --warn: #9b6410;
+  --shadow: 0 1px 2px rgba(19, 28, 36, 0.06), 0 8px 24px -14px rgba(19, 28, 36, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0f151a;
+    --surface: #171f26;
+    --surface-2: #1c252d;
+    --ink: #e7edf2;
+    --muted: #94a3af;
+    --faint: #6c7c88;
+    --rule: #2a343d;
+    --accent: #4cbacd;
+    --accent-ink: #0f151a;
+    --accent-soft: #123840;
+    --good: #69b481;
+    --bad: #d9776a;
+    --warn: #dda45b;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ---------- nav ---------- */
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 22px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; }
+.brand-mark {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.brand-name { font-weight: 600; font-size: 15.5px; line-height: 1.2; letter-spacing: -0.01em; }
+.brand-sub {
+  font-size: 10.5px; color: var(--faint);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabs { display: flex; gap: 3px; flex: 1; }
+.tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background 0.13s ease, color 0.13s ease;
+  white-space: nowrap;
+}
+.tab:hover { background: var(--surface-2); color: var(--ink); }
+.tab.is-active { background: var(--accent-soft); color: var(--accent); }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tab-num {
+  font-size: 10.5px; font-weight: 600;
+  width: 17px; height: 17px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--rule); color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tab.is-active .tab-num { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- backend status ---------- */
+.status {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; color: var(--muted);
+  white-space: nowrap; flex-shrink: 0;
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.status-up .status-dot { background: var(--good); }
+.status-down .status-dot { background: var(--bad); }
+.status-down { color: var(--bad); }
+
+/* ---------- page ---------- */
+.main { flex: 1; }
+.page { max-width: 1180px; margin: 0 auto; padding: 40px 22px 80px; }
+.page-head { max-width: 62ch; margin-bottom: 26px; }
+.page h1 {
+  font-size: 30px; font-weight: 600; letter-spacing: -0.02em;
+  margin: 0 0 8px; text-wrap: balance;
+}
+.page-lede { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* ---------- placeholder ---------- */
+.placeholder {
+  background: var(--surface);
+  border: 1px dashed var(--rule);
+  border-radius: 11px;
+  padding: 22px 24px 24px;
+  box-shadow: var(--shadow);
+  max-width: 700px;
+}
+.placeholder-tag {
+  display: inline-block;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 9px; border-radius: 5px;
+  margin-bottom: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.placeholder-list { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+.placeholder-list li { color: var(--muted); font-size: 14.5px; }
+
+@media (max-width: 780px) {
+  .nav-inner { height: auto; flex-wrap: wrap; padding: 12px 18px; gap: 14px; }
+  .tabs { order: 3; width: 100%; overflow-x: auto; }
+  .page { padding: 28px 18px 60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Phase 1: network page ---------- */
+.page-wide { max-width: 1180px; }
+
+.toolbar {
+  display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--faint);
+}
+.field select {
+  font: inherit; font-size: 14px;
+  padding: 8px 11px; min-width: 230px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 7px;
+}
+.field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.btn {
+  font: inherit; font-size: 13.5px; font-weight: 500;
+  padding: 8px 14px; border-radius: 7px; cursor: pointer;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--rule);
+  transition: background 0.13s ease, border-color 0.13s ease;
+}
+.btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- stats ---------- */
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px; margin-bottom: 14px;
+}
+.stat {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 9px; padding: 13px 15px;
+}
+.stat-n {
+  font-size: 25px; font-weight: 600; line-height: 1.1;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+}
+.stat-l {
+  font-size: 11px; color: var(--muted); margin-top: 3px;
+  letter-spacing: 0.03em;
+}
+.scenario-note {
+  color: var(--muted); font-size: 14px; margin: 0 0 18px; max-width: 70ch;
+}
+
+/* ---------- notices ---------- */
+.notice {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 9px; padding: 14px 16px; margin-bottom: 16px;
+  font-size: 14.5px;
+}
+.notice-error { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 7%, var(--surface)); }
+.notice-ok { border-color: var(--good); background: color-mix(in srgb, var(--good) 7%, var(--surface)); }
+.notice-list { margin: 10px 0 0; padding-left: 0; list-style: none; display: grid; gap: 9px; }
+.notice-list li { font-size: 14px; }
+.notice-hint { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.pill {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 2px 6px; border-radius: 4px; margin-right: 7px;
+  vertical-align: 1px;
+}
+.pill-error { background: var(--bad); color: var(--surface); }
+.pill-warning { background: var(--warn); color: var(--surface); }
+
+/* ---------- map ---------- */
+.map-wrap { position: relative; }
+.map {
+  height: 540px; width: 100%;
+  border-radius: 11px; border: 1px solid var(--rule);
+  /* Deliberately NOT a theme token. This is what shows through where tiles
+     have not loaded yet, and the tiles are light in both themes. A dark
+     placeholder turns every un-loaded edge into an obvious black band; this
+     tone matches OpenStreetMap's own land colour, so the gap barely reads. */
+  background: #e8e6e1;
+}
+.leaflet-container { font: inherit; }
+.popup strong { font-size: 14px; }
+.popup-row { font-size: 12.5px; margin-top: 3px; }
+.popup-dim { color: #666; }
+
+.legend {
+  position: absolute; bottom: 14px; left: 14px; z-index: 500;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 9px 13px;
+  display: flex; gap: 16px; font-size: 12.5px;
+  box-shadow: var(--shadow);
+}
+.legend-item { display: flex; align-items: center; gap: 7px; }
+
+/* The Results page puts its legend BELOW the map rather than floating on it -
+   it doubles as the van filter, so it needs room and a hit target per van.
+   Without this it would inherit the absolute positioning above and float over
+   whatever happens to follow. */
+.legend-flow {
+  position: static;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: none;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.legend .dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid #fff; box-sizing: content-box;
+}
+
+@media (max-width: 780px) {
+  .toolbar-actions { margin-left: 0; }
+  .map { height: 400px; }
+}
+
+/* ---------------------------------------------------------------------------
+   Phase 4 — configure, run, results
+   --------------------------------------------------------------------------- */
+
+.input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+.input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+/* configure ---------------------------------------------------------------- */
+
+.cfg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.cfg-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  padding: 20px 22px;
+}
+.cfg-card h2 { font-size: 16px; margin: 0 0 16px; letter-spacing: -.01em; }
+.cfg-field { display: block; margin-bottom: 18px; }
+.cfg-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+.cfg-hint {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.cfg-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+.cfg-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cfg-dirty {
+  font-size: 12.5px;
+  color: var(--muted);
+  align-self: center;
+}
+
+/* run ---------------------------------------------------------------------- */
+
+.run-config {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  align-self: center;
+}
+.progress-track {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--rule);
+  overflow: hidden;
+  margin: 4px 0 22px;
+}
+.progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width .12s linear;
+}
+
+/* panels ------------------------------------------------------------------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+.panel h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -.01em; }
+.panel-lede {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0 0 18px;
+  max-width: 76ch;
+  line-height: 1.6;
+}
+
+/* chart -------------------------------------------------------------------- */
+
+.chart { color: var(--ink); }
+.chart-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 13px;
+}
+.chart-final {
+  font-family: ui-monospace, Menlo, monospace;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  vertical-align: -1px;
+  margin-right: 7px;
+}
+.conv-notes { margin-top: 14px; display: grid; gap: 7px; }
+.conv-note { font-size: 13px; color: var(--muted); }
+.conv-note strong { color: var(--ink); }
+
+/* verdict ------------------------------------------------------------------ */
+
+.verdict {
+  border-radius: 11px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  font-size: 14.5px;
+  border: 1px solid;
+}
+.verdict-qpso { background: rgba(14,108,125,.10); border-color: rgba(14,108,125,.35); }
+.verdict-pso  { background: rgba(179,86,42,.10);  border-color: rgba(179,86,42,.35); }
+.verdict-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* segmented control -------------------------------------------------------- */
+
+.seg { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.seg-btn:hover { color: var(--ink); }
+.seg-on { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+
+/* table -------------------------------------------------------------------- */
+
+.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table th, .table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.table th {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table td.stops { color: var(--muted); }
+.table tbody tr:last-child td { border-bottom: none; }
+.table tr.row-on { background: var(--surface-2); }
+
+/* legend buttons ----------------------------------------------------------- */
+
+.legend-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 4px 9px;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  cursor: pointer;
+}
+.legend-btn:hover { border-color: var(--rule); }
+.legend-on { border-color: var(--accent); font-weight: 600; }
+
+/* The theme already defines --good for both light and dark. */
+.stat-good { color: var(--good); }
+
+/* Links inside body copy. Without this they fall back to the browser default
+   blue, which is close to unreadable on the dark surface. */
+.notice a,
+.page-lede a,
+.panel-lede a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.notice a:hover,
+.page-lede a:hover,
+.panel-lede a:hover { filter: brightness(1.15); }
+
+/* A Link styled as a button needs the button's own layout back. */
+a.btn { text-decoration: none; display: inline-flex; align-items: center; }

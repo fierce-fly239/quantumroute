@@ -2,7 +2,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import { useMemo } from "react";
 import "leaflet/dist/leaflet.css";
 import {
-  AutoResize, BASEMAP, CUSTOMER_COLOR, DEPOT_COLOR, FitToPoints,
+  AutoResize, CUSTOMER_COLOR, DEPOT_COLOR, FitToPoints, useBasemap,
 } from "./mapBase.jsx";
 
 export default function NetworkMap({ nodes }) {
@@ -10,6 +10,7 @@ export default function NetworkMap({ nodes }) {
   const center = depot ? [depot.lat, depot.lng] : [28.47, 77.03];
   // Memoised so FitToPoints does not refit on every unrelated re-render.
   const points = useMemo(() => nodes.map((n) => [n.lat, n.lng]), [nodes]);
+  const BASEMAP = useBasemap();
 
   return (
     <div className="map-wrap">
@@ -31,13 +32,14 @@ export default function NetworkMap({ nodes }) {
             CartoDB was evaluated and rejected: its tiles now return an
             "API KEY REQUIRED" watermark. */}
         <TileLayer
+          key={`base-${BASEMAP.key}`}
           attribution={BASEMAP.attribution}
           url={BASEMAP.url}
           keepBuffer={4}
           updateWhenZooming={false}
         />
         {BASEMAP.labels && (
-          <TileLayer url={BASEMAP.labels} keepBuffer={4} updateWhenZooming={false} />
+          <TileLayer key={`labels-${BASEMAP.key}`} url={BASEMAP.labels} keepBuffer={4} updateWhenZooming={false} />
         )}
         <AutoResize />
         <FitToPoints points={points} />

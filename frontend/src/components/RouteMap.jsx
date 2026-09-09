@@ -9,7 +9,7 @@
 import { useMemo } from "react";
 import { CircleMarker, MapContainer, Polyline, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { AutoResize, BASEMAP, DEPOT_COLOR, FitToPoints, vanColour } from "./mapBase.jsx";
+import { AutoResize, DEPOT_COLOR, FitToPoints, useBasemap, vanColour } from "./mapBase.jsx";
 
 export default function RouteMap({ routes, depot, highlight = null }) {
   const points = useMemo(
@@ -17,18 +17,20 @@ export default function RouteMap({ routes, depot, highlight = null }) {
     [routes]
   );
   const center = depot?.at ?? [28.47, 77.03];
+  const BASEMAP = useBasemap();
 
   return (
     <div className="map-wrap">
       <MapContainer center={center} zoom={12} scrollWheelZoom className="map" fadeAnimation={false}>
         <TileLayer
+          key={`base-${BASEMAP.key}`}
           attribution={BASEMAP.attribution}
           url={BASEMAP.url}
           keepBuffer={4}
           updateWhenZooming={false}
         />
         {BASEMAP.labels && (
-          <TileLayer url={BASEMAP.labels} keepBuffer={4} updateWhenZooming={false} />
+          <TileLayer key={`labels-${BASEMAP.key}`} url={BASEMAP.labels} keepBuffer={4} updateWhenZooming={false} />
         )}
         <AutoResize />
         <FitToPoints points={points} />

@@ -3,7 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QuantumRoute Optimizer</title>
+    <title>QuantumRoute · SIH26137</title>
+    <!-- Typefaces from the team's Figma design: Space Grotesk for text,
+         JetBrains Mono for numbers, labels and the solver log. Both fall back
+         to system fonts if the network is down, so the demo never depends on
+         Google being reachable. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Apply the saved theme before React mounts, so there is no flash of the
+         wrong colours. The toggle in the header writes the same key. -->
+    <script>
+      try {
+        var t = localStorage.getItem("quantumroute-theme");
+        if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

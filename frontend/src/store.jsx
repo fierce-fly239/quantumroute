@@ -62,6 +62,10 @@ export function StoreProvider({ children }) {
   const saved = load();
   const [config, setConfig] = useState(saved?.config ?? DEFAULT_CONFIG);
   const [job, setJob] = useState(null);      // live status while running
+  // The solver log lives here rather than in the Run page so it survives a
+  // trip to Results and back. Not persisted: it belongs to the job, and jobs
+  // die with the API process.
+  const [log, setLog] = useState([]);
   const [result, setResult] = useState(saved?.result ?? null); // finished solve
   const [error, setError] = useState(null);
 
@@ -82,9 +86,9 @@ export function StoreProvider({ children }) {
   const value = useMemo(
     () => ({
       config, setConfig, update, updateWeight, reset,
-      job, setJob, result, setResult, error, setError,
+      job, setJob, result, setResult, error, setError, log, setLog,
     }),
-    [config, update, updateWeight, reset, job, result, error]
+    [config, update, updateWeight, reset, job, result, error, log]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

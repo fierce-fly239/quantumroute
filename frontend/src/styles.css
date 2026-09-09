@@ -271,7 +271,7 @@ body {
 
 /* ---------- stats ---------- */
 .stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px; margin-bottom: 16px;
 }
 .stat {
@@ -288,8 +288,9 @@ body {
 .stat:nth-child(6n+6) { border-left-color: #94a3b8; }
 .stat-n {
   font-family: var(--font-mono);
-  font-size: 23px; font-weight: 700; line-height: 1.15;
+  font-size: 21px; font-weight: 700; line-height: 1.15;
   letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .stat-l {
   font-family: var(--font-mono);

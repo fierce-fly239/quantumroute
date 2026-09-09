@@ -8,6 +8,7 @@
  */
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
+import { useTheme } from "../theme.js";
 
 const ESRI_ATTR =
   'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; sources: Esri, HERE, Garmin, ' +
@@ -33,6 +34,12 @@ export const BASEMAPS = {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
     attribution: ESRI_ATTR,
   },
+  darkGrayLabelled: {
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    labels:
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+    attribution: ESRI_ATTR,
+  },
 };
 
 // The basemap in use. Each provider requires its own attribution, which is why
@@ -41,8 +48,19 @@ export const BASEMAPS = {
 // "API KEY REQUIRED" watermark.
 export const BASEMAP = BASEMAPS.lightGrayLabelled;
 
-export const DEPOT_COLOR = "#d1442f";
-export const CUSTOMER_COLOR = "#2f7fd1";
+/** The basemap that matches the current theme. Esri ships the same canvas in a
+ *  dark variant, so the map no longer sits as a bright rectangle inside the
+ *  dark UI. Returned with a `key` so a TileLayer can be re-created when the
+ *  theme flips - react-leaflet does not swap a layer's URL in place. */
+export function useBasemap() {
+  const theme = useTheme();
+  const map = theme === "dark" ? BASEMAPS.darkGrayLabelled : BASEMAPS.lightGrayLabelled;
+  return { ...map, key: theme };
+}
+
+/** Palette from the team's Figma design (9 Sep 2026): rose depot, cyan stops. */
+export const DEPOT_COLOR = "#f43f5e";
+export const CUSTOMER_COLOR = "#06b6d4";
 
 /** One colour per van. Distinguishable on a light grey basemap, and still
  *  distinguishable when a deck is printed in greyscale.
@@ -51,8 +69,8 @@ export const CUSTOMER_COLOR = "#2f7fd1";
  *  meant van 2 was drawn in exactly the depot's colour - on the map the depot
  *  became indistinguishable from one of the routes. */
 export const VAN_COLOURS = [
-  "#2f7fd1", "#2e8b57", "#8a4fbd", "#c9820b", "#0e8f8f",
-  "#b3376f", "#5a6b1f", "#3f5fa8", "#7a5c2e", "#4a4a8a",
+  "#06b6d4", "#10b981", "#a855f7", "#f59e0b", "#3b82f6",
+  "#ec4899", "#84cc16", "#f97316", "#14b8a6", "#6366f1",
 ];
 
 export const vanColour = (i) => VAN_COLOURS[i % VAN_COLOURS.length];

@@ -7,7 +7,7 @@ import { useStore } from "../store.jsx";
 const POLL_MS = 120;
 
 export default function Run() {
-  const { config, job, setJob, setResult, error, setError } = useStore();
+  const { config, job, setJob, setResult, error, setError, log, setLog } = useStore();
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   // Held in a ref, not state: the polling loop needs to cancel itself on
@@ -21,6 +21,23 @@ export default function Run() {
   const [params] = useSearchParams();
   const autoRun = params.get("demo") === "1";
   const autoStarted = useRef(false);
+
+  // The solver log. One line per poll that moved the iteration counter, so
+  // every line is a real GET /api/jobs/{id} - nothing here is scripted. The
+  // idea is from the team's Figma design; the data is ours.
+  const lastLogged = useRef(null);
+  const logBody = useRef(null);
+  const LOG_MAX = 400;
+  function pushLog(text, kind = "line") {
+    setLog((lines) => {
+      const next = lines.concat({ text, kind });
+      return next.length > LOG_MAX ? next.slice(next.length - LOG_MAX) : next;
+    });
+  }
+  useEffect(() => {
+    const el = logBody.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [log]);
 
   useEffect(() => {
     cancelled.current = false;
@@ -36,7 +53,17 @@ export default function Run() {
       const status = await getJob(id);
       setJob(status);
 
+      const stamp = `${status.phase ?? ""}:${status.iteration}`;
+      if (status.iteration != null && stamp !== lastLogged.current) {
+        lastLogged.current = stamp;
+        const phase = (status.phase || status.status || "").toUpperCase().padEnd(4);
+        const iter = String(status.iteration).padStart(String(status.total_iterations).length);
+        const best = status.best_cost != null ? status.best_cost.toFixed(2) : "—";
+        pushLog(`[${phase}] iter ${iter}/${status.total_iterations}   best ${best}`);
+      }
+
       if (status.status === "done") {
+        pushLog(`> done · best cost ${status.best_cost != null ? status.best_cost.toFixed(2) : "—"} · result ready`, "done");
         const result = await getJobResult(id);
         if (cancelled.current) return;
         setResult(result);
@@ -45,6 +72,7 @@ export default function Run() {
         return;
       }
       if (status.status === "failed") {
+        pushLog(`> failed: ${status.error || "unknown error"}`, "sys");
         setError(status.error || "The solve failed.");
         setBusy(false);
         return;
@@ -62,8 +90,13 @@ export default function Run() {
     setResult(null);
     setJob(null);
     setBusy(true);
+    setLog([]);
+    lastLogged.current = null;
     try {
       const { job_id } = await startSolve(config);
+      const algo = config.algorithm === "both" ? "QPSO + PSO" : config.algorithm.toUpperCase();
+      pushLog(`> job ${job_id} · ${algo} · ${config.network_id} · ${config.particles} particles × ${config.iterations} iterations · seed ${config.seed}`, "sys");
+      pushLog(`> polling GET /api/jobs/${job_id} every ${POLL_MS} ms`, "sys");
       poll(job_id);
     } catch (e) {
       setError(e.message);
@@ -150,6 +183,22 @@ export default function Run() {
             <span className="progress-fill" style={{ width: `${pct}%` }} />
           </div>
 
+          <section className="log" aria-label="Solver log">
+            <div className="log-head">
+              <span>Solver log · live from the API</span>
+              <span className="log-badge">
+                {job.status === "done" ? "done" : `${job.iteration} / ${job.total_iterations}`}
+              </span>
+            </div>
+            <div className="log-body" ref={logBody}>
+              {log.map((l, i) => (
+                <div key={i} className={`log-line${l.kind !== "line" ? ` log-${l.kind}` : ""}`}>
+                  {l.text}
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="panel">
             <h2>Convergence, live</h2>
             <p className="panel-lede">
@@ -158,7 +207,7 @@ export default function Run() {
               anywhere new.
             </p>
             <ConvergenceChart
-              series={[{ label: "Best so far", colour: "#0e6c7d", values: job.curve }]}
+              series={[{ label: "Best so far", colour: "#06b6d4", values: job.curve }]}
             />
           </section>
         </>

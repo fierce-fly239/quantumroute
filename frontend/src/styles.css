@@ -271,13 +271,13 @@ body {
 
 /* ---------- stats ---------- */
 .stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
   gap: 12px; margin-bottom: 16px;
 }
 .stat {
   background: var(--surface); border: 1px solid var(--rule);
   border-left: 2px solid var(--accent);
-  border-radius: 10px; padding: 12px 14px;
+  border-radius: 10px; padding: 12px 12px;
   box-shadow: var(--shadow);
 }
 /* The Figma KPI strip gives each tile its own edge colour. */
@@ -288,7 +288,7 @@ body {
 .stat:nth-child(6n+6) { border-left-color: #94a3b8; }
 .stat-n {
   font-family: var(--font-mono);
-  font-size: 21px; font-weight: 700; line-height: 1.15;
+  font-size: 20px; font-weight: 700; line-height: 1.15;
   letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

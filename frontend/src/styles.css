@@ -1,53 +1,101 @@
 /* QuantumRoute - app shell styling.
-   Light and dark are both defined at token level so the app follows the OS. */
+
+   Restyled 9 Sep 2026 to the team's Figma design (cyan on slate, Space Grotesk
+   + JetBrains Mono, glassy cards, dotted ground). Every class name from the
+   original stylesheet is kept, so the pages did not have to change to pick up
+   the new look - only the values did.
+
+   Three theme states, like the OS: <html data-theme="dark|light"> is an explicit
+   choice from the header toggle; no attribute means follow prefers-color-scheme.
+   Light is the base; the dark block is written twice on purpose (media query
+   and explicit attribute) so the toggle wins in both directions. */
 
 :root {
-  --ground: #eef1f3;
+  --ground: #f8fafc;
+  --grid-dot: rgba(203, 213, 225, 0.8);
   --surface: #ffffff;
-  --surface-2: #f5f7f9;
-  --ink: #131c24;
-  --muted: #5c6b78;
-  --faint: #8a98a3;
-  --rule: #d8dee3;
-  --accent: #0e6c7d;
+  --surface-2: #f1f5f9;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --faint: #94a3b8;
+  --rule: #e2e8f0;
+  --accent: #0891b2;
   --accent-ink: #ffffff;
-  --accent-soft: #d9ebee;
-  --good: #2c6b3e;
-  --bad: #9b3226;
-  --warn: #9b6410;
-  --shadow: 0 1px 2px rgba(19, 28, 36, 0.06), 0 8px 24px -14px rgba(19, 28, 36, 0.2);
+  --accent-soft: #cffafe;
+  --accent-glow: 0 0 12px rgba(6, 182, 212, 0.35);
+  --good: #059669;
+  --bad: #e11d48;
+  --warn: #d97706;
+  --shadow: 0 4px 18px -2px rgba(0, 0, 0, 0.06);
+  --map-frame: #e8e6e1;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --ground: #0f151a;
-    --surface: #171f26;
-    --surface-2: #1c252d;
-    --ink: #e7edf2;
-    --muted: #94a3af;
-    --faint: #6c7c88;
-    --rule: #2a343d;
-    --accent: #4cbacd;
-    --accent-ink: #0f151a;
-    --accent-soft: #123840;
-    --good: #69b481;
-    --bad: #d9776a;
-    --warn: #dda45b;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+  :root:not([data-theme="light"]) {
+    --ground: #060913;
+    --grid-dot: rgba(51, 65, 85, 0.5);
+    --surface: #0d131f;
+    --surface-2: #131c2b;
+    --ink: #f1f5f9;
+    --muted: #94a3b8;
+    --faint: #64748b;
+    --rule: rgba(255, 255, 255, 0.08);
+    --accent: #06b6d4;
+    --accent-ink: #020617;
+    --accent-soft: rgba(6, 182, 212, 0.12);
+    --accent-glow: 0 0 15px rgba(6, 182, 212, 0.4);
+    --good: #34d399;
+    --bad: #f43f5e;
+    --warn: #f59e0b;
+    --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    --map-frame: #1a1f29;
+    color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --ground: #060913;
+  --grid-dot: rgba(51, 65, 85, 0.5);
+  --surface: #0d131f;
+  --surface-2: #131c2b;
+  --ink: #f1f5f9;
+  --muted: #94a3b8;
+  --faint: #64748b;
+  --rule: rgba(255, 255, 255, 0.08);
+  --accent: #06b6d4;
+  --accent-ink: #020617;
+  --accent-soft: rgba(6, 182, 212, 0.12);
+  --accent-glow: 0 0 15px rgba(6, 182, 212, 0.4);
+  --good: #34d399;
+  --bad: #f43f5e;
+  --warn: #f59e0b;
+  --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --map-frame: #1a1f29;
+  color-scheme: dark;
+}
+
+:root {
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--ground);
+  background-color: var(--ground);
+  /* The dotted "radar grid" ground from the Figma design. */
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 15px;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
+
+.mono { font-family: var(--font-mono); }
 
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 
@@ -55,103 +103,133 @@ body {
 .nav {
   background: var(--surface);
   border-bottom: 1px solid var(--rule);
+  box-shadow: var(--shadow);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1000; /* above Leaflet's panes, which go up to 700 */
 }
 .nav-inner {
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 22px;
-  height: 62px;
+  height: 56px;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 22px;
 }
 
-.brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; }
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .brand-mark {
-  width: 11px; height: 11px; border-radius: 50%;
+  width: 12px; height: 12px; border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 2s ease-in-out infinite;
 }
-.brand-name { font-weight: 600; font-size: 15.5px; line-height: 1.2; letter-spacing: -0.01em; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.brand-name {
+  font-weight: 700; font-size: 14px; line-height: 1.2; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 7px;
+}
 .brand-sub {
-  font-size: 10.5px; color: var(--faint);
-  letter-spacing: 0.1em; text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 400; line-height: 1;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  padding: 3px 6px; border-radius: 4px;
+  letter-spacing: 0.02em;
 }
 
-.tabs { display: flex; gap: 3px; flex: 1; }
+.tabs { display: flex; gap: 4px; flex: 1; }
 .tab {
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 13px;
-  border-radius: 7px;
-  font-size: 14px; font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 500;
   color: var(--muted);
   text-decoration: none;
-  transition: background 0.13s ease, color 0.13s ease;
+  transition: background 0.13s ease, color 0.13s ease, border-color 0.13s ease;
   white-space: nowrap;
 }
-.tab:hover { background: var(--surface-2); color: var(--ink); }
-.tab.is-active { background: var(--accent-soft); color: var(--accent); }
-.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.tab-num {
-  font-size: 10.5px; font-weight: 600;
-  width: 17px; height: 17px; border-radius: 50%;
-  display: grid; place-items: center;
-  background: var(--rule); color: var(--muted);
-  font-variant-numeric: tabular-nums;
+.tab:hover { color: var(--ink); }
+.tab.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
 }
-.tab.is-active .tab-num { background: var(--accent); color: var(--accent-ink); }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tab-num { display: none; }
+
+/* header right-hand cluster: theme toggle + backend status */
+.nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.theme-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: border-color 0.13s ease;
+}
+.theme-btn:hover { border-color: var(--accent); }
+.theme-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- backend status ---------- */
 .status {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px; color: var(--muted);
   white-space: nowrap; flex-shrink: 0;
 }
-.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
-.status-up .status-dot { background: var(--good); }
-.status-down .status-dot { background: var(--bad); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.status-up .status-dot { background: var(--good); box-shadow: 0 0 8px var(--good); }
+.status-down .status-dot { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
 .status-down { color: var(--bad); }
 
 /* ---------- page ---------- */
 .main { flex: 1; }
-.page { max-width: 1180px; margin: 0 auto; padding: 40px 22px 80px; }
-.page-head { max-width: 62ch; margin-bottom: 26px; }
+.page { max-width: 1280px; margin: 0 auto; padding: 28px 22px 80px; }
+.page-head { max-width: 64ch; margin-bottom: 22px; }
 .page h1 {
-  font-size: 30px; font-weight: 600; letter-spacing: -0.02em;
-  margin: 0 0 8px; text-wrap: balance;
+  font-size: 24px; font-weight: 700; letter-spacing: -0.02em;
+  margin: 0 0 6px; text-wrap: balance;
 }
-.page-lede { margin: 0; color: var(--muted); font-size: 15px; }
+.page-lede { margin: 0; color: var(--muted); font-size: 13px; }
 
 /* ---------- placeholder ---------- */
 .placeholder {
   background: var(--surface);
   border: 1px dashed var(--rule);
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 22px 24px 24px;
   box-shadow: var(--shadow);
   max-width: 700px;
 }
 .placeholder-tag {
   display: inline-block;
+  font-family: var(--font-mono);
   font-size: 10.5px; font-weight: 600;
   letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--accent);
   background: var(--accent-soft);
   padding: 4px 9px; border-radius: 5px;
   margin-bottom: 15px;
-  font-variant-numeric: tabular-nums;
 }
 .placeholder-list { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
-.placeholder-list li { color: var(--muted); font-size: 14.5px; }
+.placeholder-list li { color: var(--muted); font-size: 14px; }
 
 @media (max-width: 780px) {
-  .nav-inner { height: auto; flex-wrap: wrap; padding: 12px 18px; gap: 14px; }
+  .nav-inner { height: auto; flex-wrap: wrap; padding: 12px 18px; gap: 12px; }
   .tabs { order: 3; width: 100%; overflow-x: auto; }
-  .page { padding: 28px 18px 60px; }
+  .nav-right { margin-left: auto; }
+  .page { padding: 22px 18px 60px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -159,107 +237,119 @@ body {
 }
 
 /* ---------- Phase 1: network page ---------- */
-.page-wide { max-width: 1180px; }
+.page-wide { max-width: 1280px; }
 
 .toolbar {
-  display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap;
+  display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
   margin-bottom: 18px;
 }
 .field { display: flex; flex-direction: column; gap: 5px; }
 .field label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--faint);
 }
 .field select {
-  font: inherit; font-size: 14px;
-  padding: 8px 11px; min-width: 230px;
-  background: var(--surface); color: var(--ink);
-  border: 1px solid var(--rule); border-radius: 7px;
+  font-family: var(--font-mono); font-size: 12.5px;
+  padding: 8px 11px; min-width: 240px;
+  background: var(--surface-2); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 6px;
 }
 .field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
 .btn {
-  font: inherit; font-size: 13.5px; font-weight: 500;
-  padding: 8px 14px; border-radius: 7px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  padding: 8px 14px; border-radius: 6px; cursor: pointer;
   background: var(--surface); color: var(--ink);
   border: 1px solid var(--rule);
-  transition: background 0.13s ease, border-color 0.13s ease;
+  transition: background 0.13s ease, border-color 0.13s ease, box-shadow 0.13s ease;
 }
-.btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--accent); }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- stats ---------- */
 .stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-  gap: 10px; margin-bottom: 14px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+  gap: 12px; margin-bottom: 16px;
 }
 .stat {
   background: var(--surface); border: 1px solid var(--rule);
-  border-radius: 9px; padding: 13px 15px;
+  border-left: 2px solid var(--accent);
+  border-radius: 10px; padding: 12px 12px;
+  box-shadow: var(--shadow);
 }
+/* The Figma KPI strip gives each tile its own edge colour. */
+.stat:nth-child(6n+2) { border-left-color: #3b82f6; }
+.stat:nth-child(6n+3) { border-left-color: #a855f7; }
+.stat:nth-child(6n+4) { border-left-color: #f59e0b; }
+.stat:nth-child(6n+5) { border-left-color: #10b981; }
+.stat:nth-child(6n+6) { border-left-color: #94a3b8; }
 .stat-n {
-  font-size: 25px; font-weight: 600; line-height: 1.1;
+  font-family: var(--font-mono);
+  font-size: 20px; font-weight: 700; line-height: 1.15;
   letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .stat-l {
-  font-size: 11px; color: var(--muted); margin-top: 3px;
-  letter-spacing: 0.03em;
+  font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--muted); margin-top: 3px;
+  letter-spacing: 0.02em;
 }
 .scenario-note {
-  color: var(--muted); font-size: 14px; margin: 0 0 18px; max-width: 70ch;
+  color: var(--muted); font-size: 13px; margin: 0 0 18px; max-width: 70ch;
 }
 
 /* ---------- notices ---------- */
 .notice {
   background: var(--surface); border: 1px solid var(--rule);
-  border-radius: 9px; padding: 14px 16px; margin-bottom: 16px;
-  font-size: 14.5px;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+  font-size: 13.5px;
+  box-shadow: var(--shadow);
 }
-.notice-error { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 7%, var(--surface)); }
-.notice-ok { border-color: var(--good); background: color-mix(in srgb, var(--good) 7%, var(--surface)); }
+.notice-error { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+.notice-ok { border-color: var(--good); background: color-mix(in srgb, var(--good) 8%, var(--surface)); }
 .notice-list { margin: 10px 0 0; padding-left: 0; list-style: none; display: grid; gap: 9px; }
-.notice-list li { font-size: 14px; }
-.notice-hint { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.notice-list li { font-size: 13.5px; }
+.notice-hint { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
 .pill {
-  display: inline-block; font-size: 10px; font-weight: 600;
+  display: inline-block; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.07em;
   padding: 2px 6px; border-radius: 4px; margin-right: 7px;
   vertical-align: 1px;
 }
-.pill-error { background: var(--bad); color: var(--surface); }
-.pill-warning { background: var(--warn); color: var(--surface); }
+.pill-error { background: var(--bad); color: #fff; }
+.pill-warning { background: var(--warn); color: #fff; }
 
 /* ---------- map ---------- */
 .map-wrap { position: relative; }
 .map {
   height: 540px; width: 100%;
-  border-radius: 11px; border: 1px solid var(--rule);
-  /* Deliberately NOT a theme token. This is what shows through where tiles
-     have not loaded yet, and the tiles are light in both themes. A dark
-     placeholder turns every un-loaded edge into an obvious black band; this
-     tone matches OpenStreetMap's own land colour, so the gap barely reads. */
-  background: #e8e6e1;
+  border-radius: 12px; border: 1px solid var(--rule);
+  /* What shows through where tiles have not loaded yet. Follows the basemap:
+     light tiles in light mode, dark tiles in dark mode - see mapBase.jsx. */
+  background: var(--map-frame);
+  box-shadow: var(--shadow);
 }
 .leaflet-container { font: inherit; }
-.popup strong { font-size: 14px; }
+.popup strong { font-size: 13.5px; }
 .popup-row { font-size: 12.5px; margin-top: 3px; }
 .popup-dim { color: #666; }
 
 .legend {
   position: absolute; bottom: 14px; left: 14px; z-index: 500;
   background: var(--surface); border: 1px solid var(--rule);
-  border-radius: 8px; padding: 9px 13px;
-  display: flex; gap: 16px; font-size: 12.5px;
+  border-radius: 8px; padding: 8px 12px;
+  display: flex; gap: 16px;
+  font-family: var(--font-mono); font-size: 11.5px;
   box-shadow: var(--shadow);
 }
 .legend-item { display: flex; align-items: center; gap: 7px; }
 
 /* The Results page puts its legend BELOW the map rather than floating on it -
-   it doubles as the van filter, so it needs room and a hit target per van.
-   Without this it would inherit the absolute positioning above and float over
-   whatever happens to follow. */
+   it doubles as the van filter, so it needs room and a hit target per van. */
 .legend-flow {
   position: static;
   margin-top: 12px;
@@ -287,12 +377,12 @@ body {
 .input {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 7px;
+  border-radius: 6px;
   border: 1px solid var(--rule);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--ink);
-  font: inherit;
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
 }
 .input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
@@ -301,10 +391,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
-  font-weight: 600;
+  color: var(--accent-ink);
+  font-weight: 700;
+  box-shadow: var(--accent-glow);
 }
-.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 
 /* configure ---------------------------------------------------------------- */
@@ -315,18 +406,35 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   gap: 16px;
   margin-bottom: 22px;
 }
+/* Three columns when there is room: the Algorithm parameters card takes the
+   two left columns and the actions sit in the third, under the weights card.
+   Below this width everything stacks and the actions come last. */
+@media (min-width: 1000px) {
+  .cfg-grid { grid-template-columns: repeat(3, 1fr); }
+  .cfg-card-wide { grid-column: span 2; }
+  .cfg-card-wide .cfg-pair { gap: 18px; }
+  .cfg-actions { align-self: start; margin-bottom: 0; }
+}
 .cfg-card {
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 20px 22px;
+  box-shadow: var(--shadow);
 }
-.cfg-card h2 { font-size: 16px; margin: 0 0 16px; letter-spacing: -.01em; }
+.cfg-card h2 {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent);
+  margin: 0 0 16px;
+}
 .cfg-field { display: block; margin-bottom: 18px; }
 .cfg-label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
   margin-bottom: 7px;
 }
 .cfg-hint {
@@ -337,7 +445,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   margin-top: 6px;
 }
 .cfg-note {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--muted);
   margin: 14px 0 0;
   padding-top: 12px;
@@ -345,23 +453,29 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 }
 .cfg-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .cfg-dirty {
-  font-size: 12.5px;
-  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--warn);
   align-self: center;
 }
 
 /* run ---------------------------------------------------------------------- */
 
 .run-config {
-  font-size: 12.5px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 7px 12px;
   align-self: center;
 }
 .progress-track {
   height: 6px;
   border-radius: 4px;
-  background: var(--rule);
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
   overflow: hidden;
   margin: 4px 0 22px;
 }
@@ -369,22 +483,64 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   display: block;
   height: 100%;
   background: var(--accent);
+  box-shadow: var(--accent-glow);
   border-radius: 4px;
   transition: width .12s linear;
 }
+
+/* solver log --------------------------------------------------------------- */
+/* The one idea taken from the Figma design's "execution stream": every line
+   here is a real poll of GET /api/jobs/{id}, not a scripted animation. */
+.log {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.log-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+.log-badge {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.log-body {
+  height: 230px;
+  overflow-y: auto;
+  padding: 10px 18px;
+  color: var(--muted);
+  line-height: 1.7;
+  scrollbar-width: thin;
+}
+.log-body::-webkit-scrollbar { width: 4px; }
+.log-body::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 4px; }
+.log-line { white-space: pre; }
+.log-line b { color: var(--accent); font-weight: 500; }
+.log-line.log-sys { color: var(--faint); }
+.log-line.log-done { color: var(--good); }
 
 /* panels ------------------------------------------------------------------- */
 
 .panel {
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 11px;
-  padding: 22px 24px;
+  border-radius: 12px;
+  padding: 20px 22px;
   margin-bottom: 18px;
+  box-shadow: var(--shadow);
 }
-.panel h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -.01em; }
+.panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 6px; letter-spacing: -.01em; }
 .panel-lede {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--muted);
   margin: 0 0 18px;
   max-width: 76ch;
@@ -398,17 +554,17 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   padding: 40px;
   text-align: center;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
 }
 .chart-legend {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   margin-top: 12px;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 .chart-final {
-  font-family: ui-monospace, Menlo, monospace;
   color: var(--muted);
   margin-left: 8px;
 }
@@ -422,23 +578,24 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   margin-right: 7px;
 }
 .conv-notes { margin-top: 14px; display: grid; gap: 7px; }
-.conv-note { font-size: 13px; color: var(--muted); }
+.conv-note { font-size: 12.5px; color: var(--muted); }
 .conv-note strong { color: var(--ink); }
 
 /* verdict ------------------------------------------------------------------ */
 
 .verdict {
-  border-radius: 11px;
-  padding: 18px 20px;
+  border-radius: 12px;
+  padding: 16px 20px;
   margin-bottom: 18px;
-  font-size: 14.5px;
+  font-size: 14px;
   border: 1px solid;
+  box-shadow: var(--shadow);
 }
-.verdict-qpso { background: rgba(14,108,125,.10); border-color: rgba(14,108,125,.35); }
-.verdict-pso  { background: rgba(179,86,42,.10);  border-color: rgba(179,86,42,.35); }
+.verdict-qpso { background: rgba(6,182,212,.10);  border-color: rgba(6,182,212,.4); }
+.verdict-pso  { background: rgba(244,63,94,.10);  border-color: rgba(244,63,94,.4); }
 .verdict-note {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 
@@ -450,19 +607,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   align-items: center;
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 13.5px;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   color: var(--muted);
   cursor: pointer;
 }
 .seg-btn:hover { color: var(--ink); }
-.seg-on { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+.seg-on { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 40%, transparent); font-weight: 600; }
 
 /* table -------------------------------------------------------------------- */
 
-.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .table th, .table td {
   text-align: left;
   padding: 10px 12px;
@@ -470,14 +627,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   vertical-align: top;
 }
 .table th {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--faint);
   font-weight: 500;
-  font-family: ui-monospace, Menlo, monospace;
 }
-.table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table td.num { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .table td.stops { color: var(--muted); }
 .table tbody tr:last-child td { border-bottom: none; }
 .table tr.row-on { background: var(--surface-2); }
@@ -487,21 +644,20 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .legend-btn {
   background: none;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: 6px;
   padding: 4px 9px;
-  font: inherit;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   color: inherit;
   cursor: pointer;
 }
 .legend-btn:hover { border-color: var(--rule); }
-.legend-on { border-color: var(--accent); font-weight: 600; }
+.legend-on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
 /* The theme already defines --good for both light and dark. */
 .stat-good { color: var(--good); }
 
-/* Links inside body copy. Without this they fall back to the browser default
-   blue, which is close to unreadable on the dark surface. */
+/* Links inside body copy. */
 .notice a,
 .page-lede a,
 .panel-lede a {

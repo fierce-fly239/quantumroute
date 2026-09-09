@@ -143,7 +143,7 @@ export default function Configure() {
           ))}
         </section>
 
-        <section className="cfg-card">
+        <section className="cfg-card cfg-card-wide">
           <h2>Algorithm parameters</h2>
           <Field
             label={`QPSO alpha: ${config.alpha_start} → ${config.alpha_end}`}
@@ -187,16 +187,19 @@ export default function Configure() {
             a 49-dimensional permutation and costs about 12%.
           </p>
         </section>
-      </div>
 
-      <div className="toolbar">
-        <button className="btn btn-primary" onClick={() => navigate("/run")}>
-          Go to Run →
-        </button>
-        <button className="btn" onClick={reset}>Reset to defaults</button>
-        {JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG) && (
-          <span className="cfg-dirty">Changed from defaults</span>
-        )}
+        {/* The actions sit in the grid's third column, under "What counts as a
+            good route", beside the wide Algorithm parameters card. On a narrow
+            screen the grid collapses to one column and they come last. */}
+        <div className="toolbar cfg-actions">
+          <button className="btn btn-primary" onClick={() => navigate("/run")}>
+            Go to Run →
+          </button>
+          <button className="btn" onClick={reset}>Reset to defaults</button>
+          {JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG) && (
+            <span className="cfg-dirty">Changed from defaults</span>
+          )}
+        </div>
       </div>
     </div>
   );

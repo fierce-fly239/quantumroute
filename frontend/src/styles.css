@@ -406,6 +406,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   gap: 16px;
   margin-bottom: 22px;
 }
+/* Three columns when there is room: the Algorithm parameters card takes the
+   two left columns and the actions sit in the third, under the weights card.
+   Below this width everything stacks and the actions come last. */
+@media (min-width: 1000px) {
+  .cfg-grid { grid-template-columns: repeat(3, 1fr); }
+  .cfg-card-wide { grid-column: span 2; }
+  .cfg-card-wide .cfg-pair { gap: 18px; }
+  .cfg-actions { align-self: start; margin-bottom: 0; }
+}
 .cfg-card {
   background: var(--surface);
   border: 1px solid var(--rule);

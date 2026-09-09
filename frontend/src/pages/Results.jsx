@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ConvergenceChart from "../components/ConvergenceChart.jsx";
 import RouteMap from "../components/RouteMap.jsx";
-import { vanColour } from "../components/mapBase.jsx";
+import { DEPOT_COLOR, vanColour } from "../components/mapBase.jsx";
 import { useStore } from "../store.jsx";
 
-const COLOUR = { qpso: "#0e6c7d", pso: "#b3562a" };
+// Figma palette: cyan for QPSO, rose for classical PSO.
+const COLOUR = { qpso: "#06b6d4", pso: "#f43f5e" };
 const NAME = { qpso: "QPSO", pso: "Classical PSO" };
 
 function Stat({ value, label, tone }) {
@@ -124,7 +125,7 @@ export default function Results() {
         <RouteMap routes={run.routes} depot={result.network.depot} highlight={highlight} />
         <div className="legend legend-flow">
           <span className="legend-item">
-            <span className="swatch" style={{ background: "#d1442f" }} /> Depot
+            <span className="swatch" style={{ background: DEPOT_COLOR }} /> Depot
           </span>
           {run.routes.map((r, i) => (
             <button

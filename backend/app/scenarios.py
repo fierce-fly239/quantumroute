@@ -12,6 +12,12 @@ simulated data is in fact required for the Phase 3 benchmark, because QPSO and P
 have to be compared on an identical, unchanging problem.
 """
 
+# `X | None` in an annotation is evaluated at def-time before Python 3.10, and
+# macOS still ships 3.9 - which made this module fail to import on a stock Mac.
+# This turns every annotation in the file into a string, so the syntax is fine
+# on 3.9 while staying exactly as readable.
+from __future__ import annotations
+
 import random
 from typing import Dict, List, Tuple
 

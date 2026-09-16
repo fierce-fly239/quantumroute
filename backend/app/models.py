@@ -83,10 +83,24 @@ class Network(BaseModel):
     nodes: List[Node]
 
 
+class EdgeSource(BaseModel):
+    """Where a graph's travel times came from. `simulated` is the zone model in
+    geo.py; `tomtom` is a frozen snapshot of live road data (see traffic.py)."""
+
+    provider: Literal["simulated", "tomtom"]
+    fetched_at: Optional[str] = None      # UTC ISO time the snapshot was taken
+    departure_time: Optional[str] = None  # the local time TomTom priced the roads for
+    cells: Optional[int] = None
+    transactions: Optional[int] = None
+    endpoint: Optional[str] = None
+    fetch_seconds: Optional[float] = None
+
+
 class NetworkGraph(Network):
     """A network with its full edge set. This is what the optimizer needs."""
 
     edges: List[Edge]
+    source: Optional[EdgeSource] = None
 
 
 class ValidationIssue(BaseModel):

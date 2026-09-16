@@ -11,8 +11,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import jobs, scenarios
-from .models import Network, NetworkGraph, NetworkMeta, ValidationResult
+from . import jobs, scenarios, traffic
+from .models import EdgeSource, Network, NetworkGraph, NetworkMeta, ValidationResult
+from .tomtom import TomTomError
 from .optimizer.exact import TooLargeForExact, exact_optimum
 from .optimizer.fitness import Weights
 from .optimizer.problem import Problem
@@ -74,19 +75,63 @@ def get_network(network_id: str) -> Network:
 
 
 @app.get("/api/networks/{network_id}/graph", response_model=NetworkGraph, tags=["network"])
-def get_network_graph(network_id: str) -> NetworkGraph:
+def get_network_graph(network_id: str, provider: Optional[str] = None) -> NetworkGraph:
     """The full weighted directed graph: every node, and every ordered pair of
     nodes as a road with distance, travel time and congestion.
 
-    This is the optimizer's input.
+    This is the optimizer's input. `provider` is `simulated` or `tomtom`;
+    unset means the server default (QR_TRAVEL_PROVIDER, simulated unless changed).
     """
-    graph = scenarios.get_graph(network_id)
+    graph = _graph_or_400(network_id, provider)
     if graph is None:
         raise HTTPException(
             status_code=404,
             detail=f"No network '{network_id}'. Available: {', '.join(scenarios.NETWORKS)}",
         )
     return graph
+
+
+def _graph_or_400(network_id: str, provider: Optional[str]) -> Optional[NetworkGraph]:
+    """None means no such network. Provider problems become clear HTTP errors."""
+    try:
+        return traffic.graph_for(network_id, provider)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except TomTomError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Travel-time source
+#
+# Simulated by default. TomTom gives real roads and live traffic, frozen to a
+# snapshot per network so every solve prices the same problem. See traffic.py.
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/traffic", tags=["network"])
+def traffic_status() -> dict:
+    """Which provider is the default, whether a TomTom key is configured, and
+    the snapshot (if any) held for each network."""
+    return traffic.status()
+
+
+@app.post("/api/networks/{network_id}/traffic/refresh", response_model=EdgeSource, tags=["network"])
+def traffic_refresh(network_id: str) -> EdgeSource:
+    """Fetch live travel times from TomTom for this network now and freeze them.
+
+    One matrix job per call; a 50-stop network costs 250 of the 2,500 free
+    monthly transactions, so this is a button, not something to poll.
+    """
+    if scenarios.get_network(network_id) is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No network '{network_id}'. Available: {', '.join(scenarios.NETWORKS)}",
+        )
+    try:
+        return traffic.refresh_snapshot(network_id)
+    except TomTomError as e:
+        raise HTTPException(status_code=502, detail=str(e))
 
 
 @app.post("/api/networks/validate", response_model=ValidationResult, tags=["network"])
@@ -134,6 +179,8 @@ class SolveRequest(BaseModel):
     # backend/validate.py.
     weighted_mbest: bool = False
     alpha_curve: Literal["linear", "quadratic"] = "linear"
+    # Where the travel times come from. None = server default.
+    provider: Optional[Literal["simulated", "tomtom"]] = None
 
 
 class JobStarted(BaseModel):
@@ -156,7 +203,7 @@ class JobStatus(BaseModel):
 @app.post("/api/solve", response_model=JobStarted, tags=["solve"])
 def solve(req: SolveRequest) -> JobStarted:
     """Start a solve. Returns immediately with a job id to poll."""
-    graph = scenarios.get_graph(req.network_id)
+    graph = _graph_or_400(req.network_id, req.provider)
     if graph is None:
         raise HTTPException(
             status_code=404,
@@ -184,6 +231,7 @@ def solve(req: SolveRequest) -> JobStarted:
         inertia=(req.inertia_start, req.inertia_end),
         weighted_mbest=req.weighted_mbest,
         alpha_curve=req.alpha_curve,
+        graph=graph,
     )
     return JobStarted(job_id=job.id)
 
@@ -224,7 +272,7 @@ def job_result(job_id: str) -> dict:
             detail=f"That solve is still {job.status}. Poll /api/jobs/{job_id} until it is done.",
         )
 
-    graph = scenarios.get_graph(job.network_id)
+    graph = job.graph or scenarios.get_graph(job.network_id)
     problem = Problem(graph)
     coords = {nd.id: [nd.lat, nd.lng] for nd in graph.nodes}
     depot = graph.nodes[0]
@@ -270,6 +318,7 @@ def job_result(job_id: str) -> dict:
             "customers": problem.customer_count, "vehicles": problem.vehicles,
             "capacity": problem.capacity, "totalDemand": problem.total_demand,
             "depot": {"name": depot.name, "at": [depot.lat, depot.lng]},
+            "source": graph.source.model_dump() if graph.source else {"provider": "simulated"},
         },
         "setup": {
             "algorithm": job.algorithm, "particles": job.particles,

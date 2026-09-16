@@ -55,6 +55,27 @@ Demands and congestion are simulated, not live. The problem statement explicitly
 the Phase 3 benchmark, because QPSO and PSO have to be compared on an identical, unchanging
 problem. Everything is seeded, so the same scenario always produces the same numbers.
 
+### Real traffic: the TomTom provider
+
+Since 16 September the travel times can also come from **TomTom Matrix Routing v2**:
+real road distances and live traffic, fetched once per network and frozen to a snapshot
+in `backend/snapshots/`. Every solve after that reads the snapshot, so QPSO and PSO still
+see the identical problem. The snapshot only changes on an explicit refresh.
+
+- `backend/.env` holds `TOMTOM_API_KEY=...` (git-ignored). Get a key at developer.tomtom.com;
+  no card, 2,500 free matrix transactions a month. A 50-stop network costs 250 per refresh.
+- Default is still `simulated`. Set `QR_TRAVEL_PROVIDER=tomtom` in `.env` to switch the
+  whole app, or pass `provider` per request: `GET /api/networks/ggn-50/graph?provider=tomtom`,
+  `POST /api/solve` with `"provider": "tomtom"`.
+- `GET /api/traffic` shows the default, whether a key is present, and each snapshot's age.
+  `POST /api/networks/{id}/traffic/refresh` fetches live numbers now.
+- Stops TomTom cannot route into at their exact coordinate (Huda City Centre is one) get a
+  routing point within ~100 m, remembered in `snapshots/routing-points.json`. The scenario
+  coordinates themselves are never edited: the benchmark depends on them.
+- The bench, sweep and solve scripts always use the simulated model. Code: `app/tomtom.py`,
+  `app/traffic.py`, `app/config.py`; tests in `tests/test_tomtom.py` run on a recorded
+  response and never touch the network.
+
 ## Running it
 
 ```bash

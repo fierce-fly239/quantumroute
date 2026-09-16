@@ -29,6 +29,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Dict, List, Literal, Optional
 
+from .models import NetworkGraph
 from .optimizer.encoding import decode
 from .optimizer.fitness import Solution, Weights
 from .optimizer.problem import Problem
@@ -73,6 +74,10 @@ class Job:
     inertia: tuple
     weighted_mbest: bool = False
     alpha_curve: str = "linear"
+
+    # The exact graph this job solved. Kept so the result is priced against the
+    # same numbers even if a TomTom snapshot is refreshed while it runs.
+    graph: Optional[NetworkGraph] = None
 
     status: Status = "queued"
     created_at: float = field(default_factory=time.time)
@@ -206,6 +211,7 @@ def start(
     inertia: tuple = (0.729, 0.729),
     weighted_mbest: bool = False,
     alpha_curve: str = "linear",
+    graph: Optional[NetworkGraph] = None,
 ) -> Job:
     """Queue a solve and return immediately with the job."""
     job = Job(
@@ -220,6 +226,7 @@ def start(
         inertia=inertia,
         weighted_mbest=weighted_mbest,
         alpha_curve=alpha_curve,
+        graph=graph,
         total_iterations=iterations,
     )
     with _lock:

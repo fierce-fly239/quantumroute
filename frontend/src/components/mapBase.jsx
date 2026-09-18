@@ -15,23 +15,10 @@ const ESRI_ATTR =
   'OpenStreetMap contributors, and the GIS user community';
 
 export const BASEMAPS = {
-  osm: {
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-  lightGray: {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-    attribution: ESRI_ATTR,
-  },
   lightGrayLabelled: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     labels:
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
-    attribution: ESRI_ATTR,
-  },
-  street: {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
     attribution: ESRI_ATTR,
   },
   darkGrayLabelled: {
@@ -42,35 +29,38 @@ export const BASEMAPS = {
   },
 };
 
-// The basemap in use. Each provider requires its own attribution, which is why
-// attribution travels with the URL rather than being hardcoded in the JSX.
-// CartoDB was evaluated and rejected: its tiles now return an
-// "API KEY REQUIRED" watermark.
-export const BASEMAP = BASEMAPS.lightGrayLabelled;
-
 /** The basemap that matches the current theme. Esri ships the same canvas in a
  *  dark variant, so the map no longer sits as a bright rectangle inside the
  *  dark UI. Returned with a `key` so a TileLayer can be re-created when the
- *  theme flips - react-leaflet does not swap a layer's URL in place. */
+ *  theme flips - react-leaflet does not swap a layer's URL in place.
+ *  CartoDB was evaluated and rejected: its tiles now return an
+ *  "API KEY REQUIRED" watermark. */
 export function useBasemap() {
   const theme = useTheme();
   const map = theme === "dark" ? BASEMAPS.darkGrayLabelled : BASEMAPS.lightGrayLabelled;
   return { ...map, key: theme };
 }
 
-/** Palette from the team's Figma design (9 Sep 2026): rose depot, cyan stops. */
-export const DEPOT_COLOR = "#f43f5e";
-export const CUSTOMER_COLOR = "#06b6d4";
+/** Palette from the Pastel Route Console design (18 Sep 2026): charcoal depot,
+ *  purple-ringed cream stops, coral for the selected one. The depot flips to
+ *  peach on the dark basemap, where charcoal would vanish. */
+export const DEPOT_COLOR = "#29233f";
+export const DEPOT_COLOR_DARK = "#f4b48e";
+export const CUSTOMER_COLOR = "#66529b";
+export const CUSTOMER_FILL = "#fffaf2";
+export const SELECTED_COLOR = "#e78368";
 
-/** One colour per van. Distinguishable on a light grey basemap, and still
- *  distinguishable when a deck is printed in greyscale.
- *
- *  DEPOT_COLOR's red is deliberately absent from this list. It was in it, which
- *  meant van 2 was drawn in exactly the depot's colour - on the map the depot
- *  became indistinguishable from one of the routes. */
+export function useDepotColour() {
+  return useTheme() === "dark" ? DEPOT_COLOR_DARK : DEPOT_COLOR;
+}
+
+/** One colour per van, in the design's family but saturated enough to read on
+ *  a grey basemap and to stay distinct when a deck is printed in greyscale.
+ *  Neither depot colour is in this list, on purpose: van 2 was once drawn in
+ *  exactly the depot's colour and the depot disappeared into a route. */
 export const VAN_COLOURS = [
-  "#06b6d4", "#10b981", "#a855f7", "#f59e0b", "#3b82f6",
-  "#ec4899", "#84cc16", "#f97316", "#14b8a6", "#6366f1",
+  "#66529b", "#3a9a78", "#e78368", "#c99a2e", "#4e7fa3",
+  "#b9557c", "#7a9a3a", "#d97a3a", "#2f8f9a", "#8067b7",
 ];
 
 export const vanColour = (i) => VAN_COLOURS[i % VAN_COLOURS.length];
@@ -155,5 +145,15 @@ export function FitToPoints({ points }) {
     map.invalidateSize();
     map.fitBounds(points, { padding: [45, 45], maxZoom: 14, animate: false });
   }, [points, map]);
+  return null;
+}
+
+/** Flies to one point when it changes, keeping the current zoom. Used when a
+ *  stop is picked from the list beside the map. */
+export function PanTo({ point }) {
+  const map = useMap();
+  useEffect(() => {
+    if (point) map.panTo(point, { animate: true, duration: 0.4 });
+  }, [point, map]);
   return null;
 }

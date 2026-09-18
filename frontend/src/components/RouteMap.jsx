@@ -1,4 +1,5 @@
-/** The solved network: one coloured line per van, depot in red.
+/** The solved network: one coloured line per van, the depot in the design's
+ *  charcoal (peach on the dark basemap).
  *
  *  Lines are drawn stop to stop. They are the VISITING ORDER, not the road
  *  geometry a driver would follow - we model roads as weighted edges between
@@ -9,7 +10,7 @@
 import { useMemo } from "react";
 import { CircleMarker, MapContainer, Polyline, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { AutoResize, DEPOT_COLOR, FitToPoints, useBasemap, vanColour } from "./mapBase.jsx";
+import { AutoResize, FitToPoints, useBasemap, useDepotColour, vanColour } from "./mapBase.jsx";
 
 export default function RouteMap({ routes, depot, highlight = null }) {
   const points = useMemo(
@@ -18,10 +19,11 @@ export default function RouteMap({ routes, depot, highlight = null }) {
   );
   const center = depot?.at ?? [28.47, 77.03];
   const BASEMAP = useBasemap();
+  const depotColour = useDepotColour();
 
   return (
     <div className="map-wrap">
-      <MapContainer center={center} zoom={12} scrollWheelZoom className="map" fadeAnimation={false}>
+      <MapContainer center={center} zoom={12} scrollWheelZoom className="map map-tall" fadeAnimation={false}>
         <TileLayer
           key={`base-${BASEMAP.key}`}
           attribution={BASEMAP.attribution}
@@ -44,7 +46,8 @@ export default function RouteMap({ routes, depot, highlight = null }) {
               pathOptions={{
                 color: vanColour(i),
                 weight: dimmed ? 2 : 3.5,
-                opacity: dimmed ? 0.22 : 0.85,
+                opacity: dimmed ? 0.22 : 0.9,
+                dashArray: "6 4",
               }}
             />
           );
@@ -59,7 +62,7 @@ export default function RouteMap({ routes, depot, highlight = null }) {
                 center={s.at}
                 radius={6}
                 pathOptions={{
-                  color: "#ffffff",
+                  color: "#fffaf2",
                   weight: 2,
                   fillColor: vanColour(i),
                   fillOpacity: dimmed ? 0.25 : 1,
@@ -83,7 +86,7 @@ export default function RouteMap({ routes, depot, highlight = null }) {
           <CircleMarker
             center={depot.at}
             radius={10}
-            pathOptions={{ color: "#ffffff", weight: 3, fillColor: DEPOT_COLOR, fillOpacity: 1 }}
+            pathOptions={{ color: "#ffffff", weight: 3, fillColor: depotColour, fillOpacity: 1 }}
           >
             <Popup>
               <div className="popup">

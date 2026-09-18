@@ -1,4 +1,4 @@
-/** One place for the state the four pages share.
+/** One place for the state the pages share.
  *
  *  Configure writes the settings, Run starts a job and watches it, Results reads
  *  what came back. Without somewhere shared, choosing a scenario on one page and
@@ -6,7 +6,7 @@
  *  re-fetching and re-solving on every navigation.
  *
  *  Deliberately a plain context and useState rather than a state library: there
- *  are four pages and one object. Anything heavier would be more machinery than
+ *  are a few pages and one object. Anything heavier would be more machinery than
  *  the app has state.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -26,6 +26,9 @@ export const DEFAULT_CONFIG = {
   alpha_end: 0.4,
   inertia_start: 0.729,
   inertia_end: 0.729,
+  // Where travel times come from: null = whatever the server's default is
+  // (simulated unless QR_TRAVEL_PROVIDER says otherwise). Set on Settings.
+  provider: null,
 };
 
 const StoreContext = createContext(null);
@@ -50,17 +53,19 @@ function load() {
   }
 }
 
-function save(config, result) {
+function save(config, result, alerts) {
   try {
-    sessionStorage.setItem(KEY, JSON.stringify({ config, result }));
+    sessionStorage.setItem(KEY, JSON.stringify({ config, result, alerts }));
   } catch {
     /* storage blocked or full - the app works, it just will not remember */
   }
 }
 
+const ALERTS_MAX = 50;
+
 export function StoreProvider({ children }) {
   const saved = load();
-  const [config, setConfig] = useState(saved?.config ?? DEFAULT_CONFIG);
+  const [config, setConfig] = useState({ ...DEFAULT_CONFIG, ...(saved?.config ?? {}) });
   const [job, setJob] = useState(null);      // live status while running
   // The solver log lives here rather than in the Run page so it survives a
   // trip to Results and back. Not persisted: it belongs to the job, and jobs
@@ -68,10 +73,14 @@ export function StoreProvider({ children }) {
   const [log, setLog] = useState([]);
   const [result, setResult] = useState(saved?.result ?? null); // finished solve
   const [error, setError] = useState(null);
+  // Alerts are things that actually happened: the API going away, a file that
+  // failed validation, a solve that failed, a traffic snapshot going stale.
+  // Nothing is seeded; an empty list is the normal state.
+  const [alerts, setAlerts] = useState(saved?.alerts ?? []);
 
   useEffect(() => {
-    save(config, result);
-  }, [config, result]);
+    save(config, result, alerts);
+  }, [config, result, alerts]);
 
   const update = useCallback((patch) => {
     setConfig((c) => ({ ...c, ...patch }));
@@ -81,14 +90,28 @@ export function StoreProvider({ children }) {
     setConfig((c) => ({ ...c, weights: { ...c.weights, [key]: value } }));
   }, []);
 
-  const reset = useCallback(() => setConfig(DEFAULT_CONFIG), []);
+  const reset = useCallback(() => setConfig((c) => ({ ...DEFAULT_CONFIG, provider: c.provider })), []);
+
+  // `key` de-duplicates: the same condition reported twice in a row (the API
+  // polled every 10 s while down) is one alert, not sixty.
+  const pushAlert = useCallback((a) => {
+    setAlerts((list) => {
+      if (a.key && list.length && list[0].key === a.key) return list;
+      const entry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, at: Date.now(), read: false, ...a };
+      return [entry, ...list].slice(0, ALERTS_MAX);
+    });
+  }, []);
+  const markAlertsRead = useCallback(() => setAlerts((list) => list.map((a) => ({ ...a, read: true }))), []);
+  const clearAlerts = useCallback(() => setAlerts([]), []);
+  const unreadAlerts = alerts.filter((a) => !a.read).length;
 
   const value = useMemo(
     () => ({
       config, setConfig, update, updateWeight, reset,
       job, setJob, result, setResult, error, setError, log, setLog,
+      alerts, pushAlert, markAlertsRead, clearAlerts, unreadAlerts,
     }),
-    [config, update, updateWeight, reset, job, result, error, log]
+    [config, update, updateWeight, reset, job, result, error, log, alerts, pushAlert, markAlertsRead, clearAlerts, unreadAlerts]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

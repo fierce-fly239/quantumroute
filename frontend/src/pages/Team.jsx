@@ -2,7 +2,7 @@ import { Card, Note, PageHead, Stat } from "../components/ui.jsx";
 import { Check, Cpu, Sparkles, Users, Zap } from "../components/icons.jsx";
 
 /** Who built this. Only facts: the team, the problem statement, the stack.
- *  Members are listed by name as the team supplies them - no placeholders. */
+ *  Names as Vrishank gave them on 18 Sep; no roles, by his choice. */
 
 const TEAM = {
   name: "Cyber Pookies",
@@ -12,7 +12,8 @@ const TEAM = {
   org: "Egreen Quanta",
   theme: "Transportation & Logistics",
   members: [
-    { name: "Vrishank Kuthiala", role: "backend, optimizer, benchmark, web app" },
+    "Anant Saboo", "Vrishank Kuthiala", "Yuvval Bhasin",
+    "Vedika Seth", "Akshay Jaiswal", "Harshit Aggarwal",
   ],
 };
 
@@ -35,17 +36,14 @@ export default function Team() {
       </div>
 
       <div className="two-col-narrow">
-        <Card title="Members" sub="who did what" className="rise rise-2">
+        <Card title="Members" sub="six of us" className="rise rise-2">
           <div className="team-grid">
-            {TEAM.members.map((m, i) => (
-              <div key={m.name} className="member">
+            {TEAM.members.map((name, i) => (
+              <div key={name} className="member">
                 <span className={`member-avatar tone-${TONES[i % TONES.length]}`}>
-                  {m.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
+                  {name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
                 </span>
-                <span>
-                  <span className="row-title">{m.name}</span>
-                  <span className="row-sub">{m.role}</span>
-                </span>
+                <span className="row-title">{name}</span>
               </div>
             ))}
           </div>

@@ -48,7 +48,7 @@ export default function ConvergenceChart({ series, height = 300 }) {
                   stroke="currentColor" strokeOpacity="0.12" strokeWidth="1" />
             <text x={PAD.left - 9} y={y(t) + 4} textAnchor="end"
                   fontSize="12" fill="currentColor" fillOpacity="0.55"
-                  fontFamily="JetBrains Mono, ui-monospace, Menlo, monospace">
+                  fontFamily="DM Mono, ui-monospace, Menlo, monospace">
               {t >= 1000 ? Math.round(t) : t.toFixed(1)}
             </text>
           </g>
@@ -65,10 +65,10 @@ export default function ConvergenceChart({ series, height = 300 }) {
         })}
 
         <text x={PAD.left} y={H - 7} fontSize="12" fill="currentColor" fillOpacity="0.55"
-              fontFamily="JetBrains Mono, ui-monospace, Menlo, monospace">0</text>
+              fontFamily="DM Mono, ui-monospace, Menlo, monospace">0</text>
         <text x={W - PAD.right} y={H - 7} textAnchor="end" fontSize="12"
               fill="currentColor" fillOpacity="0.55"
-              fontFamily="JetBrains Mono, ui-monospace, Menlo, monospace">
+              fontFamily="DM Mono, ui-monospace, Menlo, monospace">
           iteration {length - 1}
         </text>
       </svg>

@@ -41,10 +41,13 @@ export async function validateNetwork(network) {
 // --- solving -----------------------------------------------------------------
 
 export async function startSolve(config) {
+  // provider: null means "server default"; the API would reject null, so drop it.
+  const { provider, ...rest } = config;
+  const body = provider ? { ...rest, provider } : rest;
   const res = await fetch("/api/solve", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(config),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
@@ -58,4 +61,20 @@ export async function startSolve(config) {
 }
 
 export const getJob = (id) => get(`/api/jobs/${id}`);
+
+// --- travel-time source ------------------------------------------------------
+// Simulated by default; TomTom gives real roads and live traffic, frozen to a
+// snapshot per network. Refreshing costs TomTom transactions (250 for the
+// 50-stop network), so it is a button, never something the app does by itself.
+
+export const getTraffic = () => get("/api/traffic");
+
+export async function refreshTraffic(networkId) {
+  const res = await fetch(`/api/networks/${networkId}/traffic/refresh`, { method: "POST" });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail || `Refresh failed (${res.status})`);
+  }
+  return res.json();
+}
 export const getJobResult = (id) => get(`/api/jobs/${id}/result`);

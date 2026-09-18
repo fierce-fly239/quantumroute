@@ -12,8 +12,8 @@ const TEAM = {
   org: "Egreen Quanta",
   theme: "Transportation & Logistics",
   members: [
-    "Anant Saboo", "Vrishank Kuthiala", "Yuvval Bhasin",
-    "Vedika Seth", "Akshay Jaiswal", "Harshit Aggarwal",
+    "Anant Saboo", "Vrishank Kuthiala", "Vedika Seth",
+    "Yuvval Bhasin", "Akshay Jaiswal", "Harshit Aggarwal",
   ],
 };
 

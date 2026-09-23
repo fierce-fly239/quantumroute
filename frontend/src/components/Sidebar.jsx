@@ -34,7 +34,7 @@ export function Brand() {
       <span className="brand-mark" aria-hidden="true">Q</span>
       <div>
         <div className="brand-name">QuantumRoute</div>
-        <div className="brand-sub">SIH26137 / CYBER POOKIES _26</div>
+        <div className="brand-sub">SIH26137 / CYBER POOKIES_26</div>
       </div>
     </div>
   );
@@ -55,7 +55,7 @@ export default function Sidebar() {
         <NavLink to="/team" className="side-team">
           <span className="side-avatar">CP</span>
           <span>
-            <span className="side-team-name">Cyber Pookies _26</span><br />
+            <span className="side-team-name">Cyber pookies_26</span><br />
             <span className="side-team-sub">team · vedam</span>
           </span>
         </NavLink>

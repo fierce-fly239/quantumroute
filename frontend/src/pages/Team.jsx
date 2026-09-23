@@ -5,7 +5,7 @@ import { Check, Cpu, Sparkles, Users, Zap } from "../components/icons.jsx";
  *  Names as Vrishank gave them on 18 Sep; no roles, by his choice. */
 
 const TEAM = {
-  name: "Cyber Pookies _26",
+  name: "Cyber pookies_26",
   college: "Vedam School of Technology, Gurugram",
   ps: "SIH26137",
   psTitle: "Quantum-inspired vehicle route optimization",

@@ -14,10 +14,26 @@ benchmarks the result against classical Particle Swarm Optimization.
 
 ## Status
 
-**Phase 1 — network modelling.** The road network is modelled, served and validated, and the
-Network page draws it on a map. Three built-in scenarios ship with it. The optimizer arrives
-in Phase 2; the other three pages are still placeholders. See
-`../quantumroute_kb/Outputs/action-plan.md` for the full plan.
+**Complete and submitted** (SIH 2026 idea round, 23 Sep 2026, Team Cyber pookies_26,
+Vedam School of Technology, Gurugram). Seven screens, the QPSO and PSO optimisers, an
+exact solver for small networks, a paired benchmark harness, an optional live-traffic
+provider (TomTom) and 94 automated tests.
+
+Headline numbers, measured over 30 paired seeded runs with equal 40,000-evaluation budgets
+(`python3 validate.py` reproduces every one of them):
+
+| | 9 stops (proven optimum 180.71) | 49 stops (no optimum exists) |
+|---|---|---|
+| QPSO | **181.80 · 0.60 % above optimum** · σ 0.96 | **1347.8 mean · wins 20 of 30** |
+| Classical PSO | 182.87 · 1.20 % above optimum · σ 2.36 | 1356.7 mean · more consistent (σ 62 vs 131) |
+| Time | 0.08 s | 0.8 s |
+
+Demo video: <https://youtu.be/MpG4-KzjHgk>
+
+### Team
+
+Anant Saboo, Vrishank Kuthiala, Vedika Seth, Yuvval Bhasin, Akshay Jaiswal, Harshit Aggarwal
+— Vedam School of Technology, Gurugram. Problem statement SIH26137 by Egreen Quanta.
 
 ### Endpoints
 
@@ -52,7 +68,7 @@ an undirected one, which is what the problem statement asks for.
 
 Demands and congestion are simulated, not live. The problem statement explicitly permits
 *"real-time or simulated traffic conditions"* — and simulated data is in fact required for
-the Phase 3 benchmark, because QPSO and PSO have to be compared on an identical, unchanging
+the benchmark, because QPSO and PSO have to be compared on an identical, unchanging
 problem. Everything is seeded, so the same scenario always produces the same numbers.
 
 ### Real traffic: the TomTom provider
@@ -128,16 +144,20 @@ frontend/
 run.sh                starts both
 ```
 
-## The four pages
+## The pages
 
-They are not arbitrary. Each maps onto a component SIH26137 names as required:
+The four workspace pages are not arbitrary. Each maps onto a component SIH26137 names as
+required; the other three are operational.
 
-| Page | Covers | Lands |
-|---|---|---|
-| **Network** | Graph-based network modelling | Phase 1 |
-| **Configure** | Constraint handling and objective weights | Phase 4 |
-| **Run** | Convergence analysis | Phase 4 |
-| **Results** | Routes plus systematic benchmarking | Phase 4 |
+| Page | Covers |
+|---|---|
+| **Network** | Graph-based network modelling — scenario, map, stop list |
+| **Configure** | Constraint handling and objective weights, every setting explained |
+| **Run** | Convergence analysis — live progress, solver log, live curve |
+| **Results** | Routes on the map, per-van table, systematic benchmarking, verdict against the proven optimum |
+| **Alerts** | Real events only: API down, failed solve, stale traffic snapshot |
+| **Settings** | Travel-time provider (simulated / TomTom), snapshot refresh, theme |
+| **Team** | Who built it |
 
 ## How the two halves talk
 
@@ -149,7 +169,7 @@ so the app still works if the two are ever served separately.
 The connection light in the header polls `/api/health` every 10 seconds. It is the fastest
 way to tell "backend is down" apart from "frontend is broken".
 
-## Phase 2 — the optimizer
+## The optimizer from the command line
 
 QPSO solves a network from the command line. No server, no browser.
 
@@ -207,5 +227,5 @@ python3 solve.py --exact                  # solve 10 stops, verify against the t
 python3 solve.py --network ggn-50         # solve 49 stops
 python3 bench.py --network ggn-10 --runs 30 --report    # QPSO vs PSO, 30 paired runs
 python3 sweep.py --network ggn-50         # find each algorithm's best settings
-python3 tests/run_tests.py                # 73 tests, no dependencies
+python3 tests/run_tests.py                # 94 tests, no dependencies
 ```
